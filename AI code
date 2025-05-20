@@ -1,0 +1,144 @@
+#include <iostream>
+#include <vector>
+#include <string>
+#include <algorithm>
+#include <ctime>
+#include <cstdlib>
+#include <iomanip>
+
+using namespace std;
+
+class Team {
+public:
+    string name;
+    int points;
+    int goalsFor;
+    int goalsAgainst;
+    int wins;
+    int losses;
+    bool isStrong;
+
+    Team(string n, bool strong = false) : name(n), points(0), goalsFor(0), goalsAgainst(0), wins(0), losses(0), isStrong(strong) {}
+
+    int goalDifference() const {
+        return goalsFor - goalsAgainst;
+    }
+
+    void printStats() const {
+        cout << setw(15) << left << name 
+             << setw(5) << points 
+             << setw(5) << wins 
+             << setw(5) << losses 
+             << setw(5) << goalsFor 
+             << setw(5) << goalsAgainst 
+             << setw(5) << goalDifference() << endl;
+    }
+};
+
+void playMatch(Team& home, Team& away) {
+    // Προσδιορίζουμε τις πιθανότητες νίκης/ισοπαλίας
+    int homeGoals = 0;
+    int awayGoals = 0;
+    
+    // Προσομοίωση σκορ
+    homeGoals = rand() % 4;
+    if (home.isStrong) homeGoals += rand() % 2;
+    
+    awayGoals = rand() % 3;
+    if (away.isStrong) awayGoals += rand() % 2;
+    
+    // Ενημέρωση στατιστικών
+    home.goalsFor += homeGoals;
+    home.goalsAgainst += awayGoals;
+    away.goalsFor += awayGoals;
+    away.goalsAgainst += homeGoals;
+    
+    if (homeGoals > awayGoals) {
+        home.points += 3;
+        home.wins += 1;
+        away.losses += 1;
+    } else if (homeGoals < awayGoals) {
+        away.points += 3;
+        away.wins += 1;
+        home.losses += 1;
+    } else {
+        home.points += 1;
+        away.points += 1;
+    }
+}
+
+bool compareTeams(const Team& a, const Team& b) {
+    if (a.points != b.points) return a.points > b.points;
+    if (a.goalDifference() != b.goalDifference()) return a.goalDifference() > b.goalDifference();
+    return a.goalsFor > b.goalsFor;
+}
+
+void simulateLeague(vector<Team>& teams) {
+    // Διπλός αγωνιστικός γύρος (εντός-εκτός)
+    for (int round = 0; round < 2; ++round) {
+        for (size_t i = 0; i < teams.size(); ++i) {
+            for (size_t j = 0; j < teams.size(); ++j) {
+                if (i != j) {
+                    if (round == 0) {
+                        playMatch(teams[i], teams[j]);
+                    } else {
+                        playMatch(teams[j], teams[i]);
+                    }
+                }
+            }
+        }
+    }
+}
+
+void printStandings(const vector<Team>& teams) {
+    cout << "==================================================================" << endl;
+    cout << "                      TELIKH VATHMOLOGIA                          " << endl;
+    cout << "==================================================================" << endl;
+    cout << setw(15) << left << "OMADA" 
+         << setw(5) << "VATHMOI\t" 
+         << setw(5) << "NIKES\t" 
+         << setw(5) << "HTES\t" 
+         << setw(5) << "GY\t" 
+         << setw(5) << "GA\t" 
+         << setw(5) << "DIAVORA GKOL" << endl;
+    cout << "------------------------------------------------------------------" << endl;
+    
+    for (size_t i = 0; i < teams.size(); ++i) {
+        teams[i].printStats();
+    }
+}
+
+int main() {
+    srand(time(0)); // Αρχικοποίηση seed για τυχαιότητα
+    
+    vector<Team> teams;
+    
+    // Προσθήκη των 4 ισχυρών ομάδων
+    teams.push_back(Team("oly", true));
+    teams.push_back(Team("panathinaikos", true));
+    teams.push_back(Team("paok", true));
+    teams.push_back(Team("aek", true));
+    
+    // Προσθήκη των υπολοίπων 10 ομάδων
+    teams.push_back(Team("asteras"));
+    teams.push_back(Team("atrom"));
+    teams.push_back(Team("volos"));
+    teams.push_back(Team("lamia"));
+    teams.push_back(Team("pas"));
+    teams.push_back(Team("iwnikos"));
+    teams.push_back(Team("apollwn"));
+    teams.push_back(Team("levadiakos"));
+    teams.push_back(Team("ofi"));
+    teams.push_back(Team("aris"));
+    
+    // Προσομοίωση πρωταθλήματος
+    simulateLeague(teams);
+    
+    // Ταξινόμηση ομάδων
+    sort(teams.begin(), teams.end(), compareTeams);
+    
+    // Εκτύπωση τελικής βαθμολογίας
+    printStandings(teams);
+    
+    return 0;
+}

@@ -21,12 +21,12 @@ struct Team {
 int generateGoals(int attackStrength, int defenseStrength) {
     int base = rand() % 4; // ???a?a ί?s?
     double modifier = (double)(attackStrength - defenseStrength) / 100.0;
-    int goalEstimate = base + (modifier * 3); // ???s??s? ep??et???? ?µ?da?
+    int goalEstimate = base + (modifier * 3); // Adjustment based on power difference
 
     if (goalEstimate < 0) goalEstimate = 0;
     if (goalEstimate > 5) goalEstimate = 5;
 
-    return rand() % (goalEstimate + 1); // ?p? 0 ??? estimate
+    return rand() % (goalEstimate + 1); // Goals between 0 and goalEstimate
 }
 
 
@@ -118,12 +118,12 @@ int main() {
     // 2 rounds: each team plays each other twice (home-away)
     for (int i = 0; i < teamCount; ++i) {
         for (int j = i + 1; j < teamCount; ++j) {
-            // ???t?? a???a? (e?t?? ?d?a? ??a ?µ?da i)
+            // First match (home for team i)
             int goalsHome1 = generateGoals(teams[i].strength, teams[j].strength);
             int goalsAway1 = generateGoals(teams[j].strength, teams[i].strength);
             updateStats(teams[i], teams[j], goalsHome1, goalsAway1);
 
-            // ?e?te??? a???a? (e?t?? ?d?a? ??a ?µ?da j)
+            // Second match (home for team j)
             int goalsHome2 = generateGoals(teams[j].strength, teams[i].strength);
             int goalsAway2 = generateGoals(teams[i].strength, teams[j].strength);
             updateStats(teams[j], teams[i], goalsHome2, goalsAway2);

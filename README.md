@@ -15,7 +15,20 @@ struct Team {
     int goals_for;
     int goals_against;
     int points;
+    int strength;
 };
+//Function that calculates how many goals a team will score based on offensive and defensive strength
+int generateGoals(int attackStrength, int defenseStrength) {
+    int base = rand() % 4; // ???a?a ί?s?
+    double modifier = (double)(attackStrength - defenseStrength) / 100.0;
+    int goalEstimate = base + (modifier * 3); // ???s??s? ep??et???? ?µ?da?
+
+    if (goalEstimate < 0) goalEstimate = 0;
+    if (goalEstimate > 5) goalEstimate = 5;
+
+    return rand() % (goalEstimate + 1); // ?p? 0 ??? estimate
+}
+
 
 // Update statistical groups
 void updateStats(Team& home, Team& away, int goalsHome, int goalsAway) {
@@ -68,12 +81,28 @@ int main() {
 
     string names[teamCount] = {
         "Panathinaikos", "Olympiakos", "AEK", "PAOK",
-        "Aris", "OFI", "Asteras", "Atromitos",
+        "Aris", "OFI", "Asteras Tripolis", "Atromitos",
         "Volos", "Lamia", "Levadiakos", "Panserraikos",
         "Kallithea", "Panetolikos"
     };
+    float strengthValues[teamCount] = {
+    39.4, // Panathinaikos
+    40, // Olympiakos
+    39.4, // AEK
+    39.8, // PAOK
+    25, // Aris
+    6, // OFI
+    6, // Asteras
+    6, // Atromitos
+    4, // Volos
+    4, // Lamia
+    4, // Levadiakos
+    4, // Panserraikos
+    4, // Kallithea
+    5  // Panetolikos
+};
 
-    // initializing names and resetting statistics
+    // initializing names resetting statistics
     for (int i = 0; i < teamCount; ++i) {
         teams[i].name = names[i];
         teams[i].played = 0;
@@ -83,19 +112,20 @@ int main() {
         teams[i].goals_for = 0;
         teams[i].goals_against = 0;
         teams[i].points = 0;
+        teams[i].strength = strengthValues[i];
     }
 
     // 2 rounds: each team plays each other twice (home-away)
     for (int i = 0; i < teamCount; ++i) {
         for (int j = i + 1; j < teamCount; ++j) {
-            // first game
-            int goalsHome1 = rand() % 5;
-            int goalsAway1 = rand() % 5;
+            // ???t?? a???a? (e?t?? ?d?a? ??a ?µ?da i)
+            int goalsHome1 = generateGoals(teams[i].strength, teams[j].strength);
+            int goalsAway1 = generateGoals(teams[j].strength, teams[i].strength);
             updateStats(teams[i], teams[j], goalsHome1, goalsAway1);
 
-            // second game
-            int goalsHome2 = rand() % 5;
-            int goalsAway2 = rand() % 5;
+            // ?e?te??? a???a? (e?t?? ?d?a? ??a ?µ?da j)
+            int goalsHome2 = generateGoals(teams[j].strength, teams[i].strength);
+            int goalsAway2 = generateGoals(teams[i].strength, teams[j].strength);
             updateStats(teams[j], teams[i], goalsHome2, goalsAway2);
         }
     }
